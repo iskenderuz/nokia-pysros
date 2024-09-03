@@ -11,9 +11,9 @@ from pysros.pprint import printTree
 
 
 credentials = {
-    "host" : "172.18.67.201",
-    "username" : "admin",
-    "password" : "admin",
+    "host" : "192.168.1.1",
+    "username" : "my_username",
+    "password" : "my_password",
     "port" : 830,
     }
 
@@ -57,14 +57,14 @@ def print_table(rows, cols):
         [col[0] for col in cols]
     )
 
-    table = Table("PE-CE BGP neighbor list", cols, width=width)
+    table = Table("BGP neighbor list", cols, width=width)
     table.print(rows)
 
 
 
 def get_config_vprn_base_bgp():
     conn_obj = get_connection(credentials)
-    path_list = [
+    conf_path_list = [
         "/nokia-conf:configure/service/vprn",
         "/nokia-conf:configure/router",
     ]
@@ -72,7 +72,7 @@ def get_config_vprn_base_bgp():
     rows = []
     cols = []
 
-    for path in path_list:
+    for path in conf_path_list:
         vrouter_type = path.rsplit("/", maxsplit=1)[-1]
         vrouter_config = conn_obj.running.get(path)
 
