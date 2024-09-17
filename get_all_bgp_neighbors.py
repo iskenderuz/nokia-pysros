@@ -11,9 +11,9 @@ from pysros.pprint import printTree
 
 
 credentials = {
-    "host" : "192.168.1.1",
-    "username" : "my_username",
-    "password" : "my_password",
+    "host" : "172.18.67.201",
+    "username" : "admin",
+    "password" : "admin",
     "port" : 830,
     }
 
@@ -45,12 +45,12 @@ def get_connection(creds):
 
 def print_table(rows, cols):
     cols = [
-        (15, "Service Name"),
-        (10, "Service Type"),
+        (10, "Name"),
+        (10, "Type"),
         (20, "Peer IP"),
         (10, "Peer Group"),
-        (10, "Peer AS"),
-#        (15, "Peer Status"),
+        (8, "Peer AS"),
+        (20, "Peer Status"),
     ]
 
     width = sum(
@@ -62,7 +62,7 @@ def print_table(rows, cols):
 
 
 
-def get_config_vprn_base_bgp():
+def get_vprn_base_bgp():
     conn_obj = get_connection(credentials)
     conf_path_list = [
         "/nokia-conf:configure/service/vprn",
@@ -93,6 +93,10 @@ def get_config_vprn_base_bgp():
                     else:
                         vrtr_pair.append("None")
 
+                for ip in vrouter_bgp_neighbor:
+                    vrouter_bgp_neig_state = conn_obj.running.get('/nokia-state:state/service/vprn[service-name=%s]/bgp/neighbor[ip-address=%s]/statistics/session-state' %(vrtr_name, ip))
+                    vrtr_pair.append(vrouter_bgp_neig_state)
+
                 rows.append(vrtr_pair)
 
 
@@ -112,12 +116,16 @@ def get_config_vprn_base_bgp():
                     else:
                         vrtr_pair.append("None")
 
+                for ip in vrouter_bgp_neighbor:
+                    vrouter_bgp_neig_state = conn_obj.running.get('/nokia-state:state/router[router-name="Base"]/bgp/neighbor[ip-address=%s]/statistics/session-state' %ip)
+                    vrtr_pair.append(vrouter_bgp_neig_state)
 
                 rows.append(vrtr_pair)
+
 
     print_table(rows, cols)
     conn_obj.disconnect()
 
 
 if __name__ == "__main__":
-    get_config_vprn_base_bgp()
+    get_vprn_base_bgp()
